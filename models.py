@@ -4,6 +4,24 @@ from pyspark.ml.classification import MultilayerPerceptronClassifier
 from pyspark.ml.regression import LinearRegression
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.regression import DecisionTreeRegressor
+from pyspark.ml.classification import LogisticRegression
+from pyspark.ml.evaluation import BinaryClassificationEvaluator
+
+
+def TrainLR(trainingData,testData):
+    # Train a  model.
+    lr = LogisticRegression(maxIter=10, regParam=0.3, elasticNetParam=0.8)
+    model = lr.fit(trainingData)
+    # Make predictions.
+    predictions = model.transform(testData)
+    
+    # Select (prediction, true label) and compute test error
+    evaluator = BinaryClassificationEvaluator(
+        labelCol="label", rawPredictionCol="prediction", metricName="areaUnderROC")
+    auc = evaluator.evaluate(predictions)
+    print("AUC = %g" % (auc,))
+    
+    return model
 
 
 def TrainDT(trainingData,testData):
