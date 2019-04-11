@@ -6,12 +6,16 @@ from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.regression import DecisionTreeRegressor
 from pyspark.ml.classification import LogisticRegression
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
+import time
 
 
-def TrainLR(trainingData,testData):
+def TrainLogReg(trainingData,testData):
     # Train a  model.
     lr = LogisticRegression(maxIter=10, regParam=0.3, elasticNetParam=0.8)
+    start = time.time()
     model = lr.fit(trainingData)
+    end = time.time()
+    print('Training LR model took',end-start)
     # Make predictions.
     predictions = model.transform(testData)
     
@@ -29,7 +33,10 @@ def TrainDT(trainingData,testData):
     dt = DecisionTreeRegressor()
 
     # Train model.  This also runs the indexer.
+    start = time.time()
     model = dt.fit(trainingData)
+    end = time.time()
+    print('Training DT model took',end-start)
 
     # Make predictions.
     predictions = model.transform(testData)
@@ -48,12 +55,15 @@ def TrainDT(trainingData,testData):
     return model
 
 
-def TrainLR(trainingData,testData):
+def TrainLinReg(trainingData,testData):
     
     lr = LinearRegression(maxIter=15, regParam=0.3, elasticNetParam=0.8)
 
     # Fit the model
+    start = time.time()
     lrModel = lr.fit(trainingData)
+    end = time.time()
+    print('Training LR model took',end-start)
 
     # Print the coefficients and intercept for linear regression
     #print("Coefficients: %s" % str(lrModel.coefficients))
@@ -90,7 +100,10 @@ def TrainMLP(trainingData,testData,layers):
     mlp = MultilayerPerceptronClassifier(maxIter=100, layers=layers, blockSize=128)
 
     # train the model
+    start = time.time()
     model = mlp.fit(trainingData)
+    end = time.time()
+    print('Training MLP model took',end-start)
 
     # Make predictions.
     predictions = model.transform(testData)
@@ -107,7 +120,10 @@ def TrainMLP(trainingData,testData,layers):
 def TrainRF(trainingData,testData,numTrees=10):
     # Train a RandomForest model.
     rf = RandomForestClassifier(numTrees=numTrees)
+    start = time.time()
     model = rf.fit(trainingData)
+    end = time.time()
+    print('Training RF model took',end-start)
     # Make predictions.
     predictions = model.transform(testData)
     # Select (prediction, true label) and compute test error

@@ -35,7 +35,7 @@ print('HIGGS preprocessing time:', end - start)
 # Training
 
 start = time. time()
-model = TrainLR(trainingData,testData)
+model = TrainLogReg(trainingData,testData)
 end = time. time()
 print('HIGGS LR training time:', end - start)
 #model.save('Models/'+dataset_name+'_RF')
@@ -72,7 +72,7 @@ print('HEPMASS preprocessing time:', end - start)
 # Training
 
 start = time. time()
-model = TrainLR(trainingData,testData)
+model = TrainLogReg(trainingData,testData)
 end = time. time()
 print('HEPMASS RF training time:', end - start)
 #model.save('Models/'+dataset_name+'_RF')

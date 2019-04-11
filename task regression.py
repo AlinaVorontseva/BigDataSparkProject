@@ -46,7 +46,7 @@ print('SGEMM DT training time:', end - start)
 #model.save('Models/'+dataset_name+'_DT')
 
 start = time. time()
-model = TrainLR(trainingData,testData)
+model = TrainLinReg(trainingData,testData)
 end = time. time()
 print('SGEMM LR training time:', end - start)
 #model.save('Models/'+dataset_name+'_LR')
@@ -77,7 +77,7 @@ print('Year preprocessing time:', end - start)
 # Training
 
 start = time. time()
-model = TrainLR(trainingData,testData)
+model = TrainLinReg(trainingData,testData)
 end = time. time()
 print('Year LR training time:', end - start)
 #model.save('Models/'+dataset_name+'_LR')
