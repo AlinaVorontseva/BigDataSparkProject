@@ -6,7 +6,39 @@ from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.regression import DecisionTreeRegressor
 from pyspark.ml.classification import LogisticRegression
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
+from pyspark.ml.classification import LinearSVC
 import time
+
+
+def TrainSVM(trainingData,testData):    
+    # create the trainer and set its parameters
+    lsvc = LinearSVC(maxIter=10, regParam=0.1)
+
+    # train the model
+    start = time.time()
+    model = lsvc.fit(trainingData)
+    end = time.time()
+    print('Training LR model took',end-start)
+    
+    # Make predictions train.
+    predictions = model.transform(trainData)
+
+    # Select (prediction, true label) and compute test error
+    evaluator = BinaryClassificationEvaluator(
+        labelCol="label", rawPredictionCol="prediction", metricName="areaUnderROC")
+    auc = evaluator.evaluate(predictions)
+    print("AUC train = %g" % (auc,))
+
+    # Make predictions test.
+    predictions = model.transform(testData)
+
+    # Select (prediction, true label) and compute test error
+    evaluator = BinaryClassificationEvaluator(
+        labelCol="label", rawPredictionCol="prediction", metricName="areaUnderROC")
+    auc = evaluator.evaluate(predictions)
+    print("AUC test = %g" % (auc,))
+    
+    return model
 
 
 def TrainLogReg(trainingData,testData):
@@ -16,14 +48,24 @@ def TrainLogReg(trainingData,testData):
     model = lr.fit(trainingData)
     end = time.time()
     print('Training LR model took',end-start)
-    # Make predictions.
+    
+    # Make predictions train.
+    predictions = model.transform(trainingData)
+    
+    # Select (prediction, true label) and compute test error
+    evaluator = BinaryClassificationEvaluator(
+        labelCol="label", rawPredictionCol="prediction", metricName="areaUnderROC")
+    auc = evaluator.evaluate(predictions)
+    print("AUC train = %g" % (auc,))
+    
+    # Make predictions test.
     predictions = model.transform(testData)
     
     # Select (prediction, true label) and compute test error
     evaluator = BinaryClassificationEvaluator(
         labelCol="label", rawPredictionCol="prediction", metricName="areaUnderROC")
     auc = evaluator.evaluate(predictions)
-    print("AUC = %g" % (auc,))
+    print("AUC test = %g" % (auc,))
     
     return model
 
@@ -51,6 +93,20 @@ def TrainDT(trainingData,testData):
         labelCol="label", predictionCol="prediction", metricName="r2")
     r2 = evaluator.evaluate(predictions)
     print("R2 on test data = %g" % r2)
+    
+    # Make predictions for train
+    predictions = model.transform(trainingData)
+
+    # Select (prediction, true label) and compute test error
+    evaluator = RegressionEvaluator(
+        labelCol="label", predictionCol="prediction", metricName="rmse")
+    rmse = evaluator.evaluate(predictions)
+    print("Root Mean Squared Error (RMSE) on train data = %g" % rmse)
+    
+    evaluator = RegressionEvaluator(
+        labelCol="label", predictionCol="prediction", metricName="r2")
+    r2 = evaluator.evaluate(predictions)
+    print("R2 on train data = %g" % r2)
     
     return model
 
