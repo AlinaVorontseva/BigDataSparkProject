@@ -7,6 +7,8 @@ sparkR.session(master = "local[*]", sparkConfig = list(spark.driver.memory = "16
 #read data
 sgem <- fread("sgemm_product.csv", header = TRUE)
 msd <- fread("YearPredictionMSD.txt", header = FALSE)
+sgem$average <- rowMeans(sgem[, 15:18])
+sgem[, 15:18] <- NULL
 
 set.seed(123)
 train_ind_sgem <- base::sample(seq_len(nrow(sgem)), size = floor(0.8 * nrow(sgem)))
@@ -42,8 +44,9 @@ predictions <- predict(model, test_sgem)
 end_time <- Sys.time()
 elapsed_time <- end_time - start_time
 rmse <- rmse(as.data.frame(predictions)$prediction, test_label_sgem)
+r2 <- cor(as.data.frame(predictions)$prediction, test_label_sgem)**2
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-print(paste0("dataset: SGEM with rmse = ", rmse, ". Time spent: ", elapsed_time))
+print(paste0("dataset: SGEM (linear regr) with rmse = ", rmse, " and R^2 ", r2, ". Time spent: ", elapsed_time))
 
 start_time <- Sys.time()
 model <- spark.glm(training_msd, V1 ~ ., family = "gaussian")
@@ -51,6 +54,28 @@ predictions <- predict(model, test_msd)
 end_time <- Sys.time()
 elapsed_time <- end_time - start_time
 rmse <- rmse(as.data.frame(predictions)$prediction,test_label_msd)
+r2 <- cor(as.data.frame(predictions)$prediction, test_label_msd)**2
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-print(paste0("dataset: MSD with rmse = ", rmse, ". Time spent: ", elapsed_time))
+print(paste0("dataset: MSD (linear regr) with rmse = ", rmse, " and R^2 ", r2,". Time spent: ", elapsed_time))
+
+######### decision tree
+start_time <- Sys.time()
+model <- spark.decisionTree(training_sgem, average ~ ., "regression")
+predictions <- predict(model, test_sgem)
+end_time <- Sys.time()
+elapsed_time <- end_time - start_time
+rmse <- rmse(as.data.frame(predictions)$prediction, test_label_sgem)
+r2 <- cor(as.data.frame(predictions)$prediction, test_label_sgem)**2
+print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+print(paste0("dataset: SGEM (with decision tree) with rmse = ", rmse," and R^2 ", r2, ". Time spent: ", elapsed_time))
+
+start_time <- Sys.time()
+model <- spark.decisionTree(training_msd, V1 ~ ., "regression")
+predictions <- predict(model, test_msd)
+end_time <- Sys.time()
+elapsed_time <- end_time - start_time
+rmse <- rmse(as.data.frame(predictions)$prediction,test_label_msd)
+r2 <- cor(as.data.frame(predictions)$prediction, test_label_msd)**2
+print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+print(paste0("dataset: MSD (with decision tree) with rmse = ", rmse, " and R^2 ", r2, ". Time spent: ", elapsed_time))
 
