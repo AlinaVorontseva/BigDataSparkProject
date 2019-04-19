@@ -21,7 +21,7 @@ def TrainSVM(trainingData,testData):
     print('Training LR model took',end-start)
     
     # Make predictions train.
-    predictions = model.transform(trainData)
+    predictions = model.transform(trainingData)
 
     # Select (prediction, true label) and compute test error
     evaluator = BinaryClassificationEvaluator(

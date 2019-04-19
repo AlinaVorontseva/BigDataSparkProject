@@ -1,12 +1,14 @@
 library(SparkR)
+install.packages("data.table")
 library(data.table)
+install.packages("Metrics")
 library(Metrics)
 
 sparkR.session(master = "local[*]", sparkConfig = list(spark.driver.memory = "16g", spark.executor.memory="16g"))
 
 #read data
-sgem <- fread("sgemm_product.csv", header = TRUE)
-msd <- fread("YearPredictionMSD.txt", header = FALSE)
+sgem <- fread("Datasets/SGEMM/sgemm_product_dataset/sgemm_product.csv", header = TRUE)
+msd <- fread("Datasets/Year/YearPredictionMSD.txt", header = FALSE)
 sgem$average <- rowMeans(sgem[, 15:18])
 sgem[, 15:18] <- NULL
 

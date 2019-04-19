@@ -3,8 +3,8 @@ library(data.table)
 sparkR.session(master = "local[*]", sparkConfig = list(spark.driver.memory = "16g", spark.executor.memory="16g"))
 
 #read data
-higgs <- fread("HIGGS.csv.gz", header = FALSE)
-hepmas <- fread("all_train.csv.gz", header = TRUE)
+higgs <- fread("gs://bigdata_data/Datasets/HIGGS/HIGGS.csv", header = FALSE)
+hepmas <- fread("gs://bigdata_data/Datasets/HEPMASS/all_train.csv", header = TRUE)
 
 set.seed(123)
 train_ind_higgs <- base::sample(seq_len(nrow(higgs)), size = floor(0.8 * nrow(higgs)))
@@ -22,7 +22,7 @@ training_hepmas <- hepmas
 
 test_higgs <- higgs[-train_ind_higgs, col_higgs_test, with = FALSE]
 #test_hepmas <- hepmas[-train_ind_hepmas, col_hepmas_test, with = FALSE]
-test_hepmas <- fread("all_test.csv.gz", header = TRUE)
+test_hepmas <- fread("gs://bigdata_data/Datasets/HEPMASS/all_test.csv", header = TRUE)
 test_hepmas <- test_hepmas[, -1]
 
 test_label_higgs <- higgs[-train_ind_higgs, "V1"]
